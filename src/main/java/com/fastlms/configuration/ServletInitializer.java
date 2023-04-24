@@ -1,4 +1,4 @@
-package com.fastlms;
+package com.fastlms.configuration;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

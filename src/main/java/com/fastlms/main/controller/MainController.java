@@ -1,4 +1,4 @@
-package com.fastlms;
+package com.fastlms.main.controller;
 
 // MainPage 클래스를 만든 목적은
 // 매핑하기 위해
