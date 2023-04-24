@@ -21,11 +21,14 @@ public class MainController {
     private final MailComponents mailComponents;
     @RequestMapping("/")
     public String index() {
+        /*
         // mailComponents.sendMailTest();
         String email="dlalgus95@naver.com";
         String subject="안녕하세요 이미현입니다. ";
         String text = "<p>ㅎㅇㅎㅇ</p>";
         mailComponents.sendMail(email, subject, text);
+        */
+
         return "index";
     }
 

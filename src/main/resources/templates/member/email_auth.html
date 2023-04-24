@@ -2,17 +2,17 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>회원 가입 완료</title>
+    <title>회원 활성화</title>
 </head>
 <body>
-    <div th:if="${result}">
-        <h1>회원 가입 완료</h1>
-        <p>회원 가입이 완료되었습니다.</p>
-    </div>
+<h1>회원 활성화</h1>
+<div th:if="${result eq true}">
+    <p>회원님의 계정이 활성화 되었습니다. </p>
+</div>
 
-    <div th:if="${result eq false}">
-        <h1>회원 가입 실패</h1>
-        <p>회원 가입에 실패하였습니다. </p>
-    </div>
+<div th:if="${result eq false}">
+    <p>회원님의 계정 활성화에 실패하였습니다. </p>
+</div>
+
 </body>
 </html>

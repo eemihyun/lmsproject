@@ -1,13 +1,19 @@
 package com.fastlms.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Member {
     @Id
     private String userId;
@@ -17,5 +23,6 @@ public class Member {
     private LocalDateTime regDt;
 
     private boolean emailAuthYn;
+    private LocalDateTime emailAuthDt; //이메일 인증한 날짜
     private String emailAuthKey;
 }
