@@ -25,4 +25,10 @@ public class Member {
     private boolean emailAuthYn;
     private LocalDateTime emailAuthDt; //이메일 인증한 날짜
     private String emailAuthKey;
+
+    private String resetPasswordKey;
+    private LocalDateTime resetPasswordLimitDt; // 비번유효날짜
+
+
+
 }

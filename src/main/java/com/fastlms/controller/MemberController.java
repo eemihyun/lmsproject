@@ -1,6 +1,7 @@
 package com.fastlms.controller;
 
 import com.fastlms.dto.MemberInput;
+import com.fastlms.dto.ResetPasswordInput;
 import com.fastlms.entity.Member;
 import com.fastlms.repository.MemberRepository;
 import com.fastlms.service.MemberService;
@@ -25,6 +26,25 @@ public class MemberController {
     @RequestMapping("/member/login")
     public String login() {
         return "member/login";
+    }
+
+    //비밀번호 찾기
+    @GetMapping("/member/find-password")
+    public String findPassword() {
+        return "member/find_password";
+    }
+
+    @PostMapping("/member/find-password")
+    public String findPasswordSubmit(ResetPasswordInput resetPasswordInput, Model model) {
+        boolean result = false;
+        try {
+            memberService.sendResetPassword(resetPasswordInput);
+            result=true;
+        } catch (Exception e){
+
+        }
+        model.addAttribute("result", result);
+        return "member/find_password_result";
     }
 
     @GetMapping("/member/info")
@@ -64,8 +84,30 @@ public class MemberController {
         return "member/email_auth";
     }
 
+    // 비밀번호 링크 타고 진입시
+    @GetMapping("/member/reset/password")
+    public String resetPassword(Model model,HttpServletRequest request){
+        System.out.println("비밀번호 get페이지 진입");
+        String uuid = request.getParameter("id");
+        model.addAttribute("uuid",uuid);
 
+        boolean result = memberService.checkResetPassword(uuid);
+        model.addAttribute("result", result);
+        return "member/reset_password";
+    }
 
+    @PostMapping("/member/reset/password")
+    public String resetPasswordSubmit(Model model, ResetPasswordInput parameter) {
+        boolean result = true;
+        try {
+            System.out.println("비밀번호 초기화 진입");
+             memberService.resetPassword(parameter.getId(), parameter.getPassword());
+             result = true;
+        } catch (Exception e) {
 
+        }
 
+        model.addAttribute("result", result);
+        return "member/reset_password_result";
+    }
 }
