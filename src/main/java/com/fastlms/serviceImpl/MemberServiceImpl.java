@@ -1,5 +1,9 @@
 package com.fastlms.serviceImpl;
 
+
+import com.fastlms.admin.dto.MemberDto;
+import com.fastlms.admin.mapper.MemberMapper;
+import com.fastlms.admin.model.MemberParam;
 import com.fastlms.components.MailComponents;
 import com.fastlms.dto.MemberInput;
 import com.fastlms.dto.ResetPasswordInput;
@@ -15,8 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +29,15 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class MemberServiceImpl implements MemberService{
+public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final MailComponents mailComponents;
+    private final MemberMapper memberMapper;
 
+    /**
+     * 회원 가입
+     */
     @Override
     public boolean register(MemberInput parameter) {
 
@@ -96,30 +104,32 @@ public class MemberServiceImpl implements MemberService{
         return true;
     }
 
-    // 비밀번호 초기화 메서드
     @Override
-    public boolean sendResetPassword(ResetPasswordInput resetPasswordInput) {
-        Optional<Member> optionalMember = memberRepository.findByUserIdAndUserName(resetPasswordInput.getUserId(), resetPasswordInput.getUserName());
+    public boolean sendResetPassword(ResetPasswordInput parameter) {
 
-        if( !optionalMember.isPresent()) {
+        Optional<Member> optionalMember = memberRepository.findByUserIdAndUserName(parameter.getUserId(), parameter.getUserName());
+        if (!optionalMember.isPresent()) {
             throw new UsernameNotFoundException("회원 정보가 존재하지 않습니다.");
         }
 
-        Member member= optionalMember.get();
+        Member member = optionalMember.get();
+
         String uuid = UUID.randomUUID().toString();
 
         member.setResetPasswordKey(uuid);
         member.setResetPasswordLimitDt(LocalDateTime.now().plusDays(1));
         memberRepository.save(member);
 
-        String email = resetPasswordInput.getUserId();
-        String subject = "[mhlms] 비밀번호 초기화 메일 입니다.";
-        String text = "<p>mhlms 비밀번호 초기화 메일입니다.</p><p>아래 링크를 클릭하셔서 비밀번호를 초기화 해주세요.</p>"
-                +"<div> <a target='_blank' href='http://localhost:8080/member/reset/password?id=" + uuid+"'> 비밀번호 초기화 링크 </a></div>";
+        String email = parameter.getUserId();
+        String subject = "[fastlms] 비밀번호 초기화 메일 입니다. ";
+        String text = "<p>fastlms 비밀번호 초기화 메일 입니다.<p>" +
+                "<p>아래 링크를 클릭하셔서 비밀번호를 초기화 해주세요.</p>"+
+                "<div><a target='_blank' href='http://localhost:8080/member/reset/password?id=" + uuid + "'> 비밀번호 초기화 링크 </a></div>";
         mailComponents.sendMail(email, subject, text);
 
-        return true;
+        return false;
     }
+
 
     @Override
     public boolean resetPassword(String uuid, String password) {
@@ -139,7 +149,7 @@ public class MemberServiceImpl implements MemberService{
         if( member.getResetPasswordLimitDt().isBefore(LocalDateTime.now()) ){
             throw new RuntimeException("유효한 날짜가 아닙니다.");
         }
-        
+
         System.out.println("지지지지지진짜 진입");
 
         String encPassword = BCrypt.hashpw(password, BCrypt.gensalt());
@@ -150,6 +160,8 @@ public class MemberServiceImpl implements MemberService{
 
         return true;
     }
+
+
 
     @Override
     public boolean checkResetPassword(String uuid) {
@@ -173,7 +185,38 @@ public class MemberServiceImpl implements MemberService{
         return true;
     }
 
-    // username: email
+
+    @Override
+    public List<MemberDto> list(MemberParam parameter) {
+
+        long totalCount = memberMapper.selectListCount(parameter);
+
+        List<MemberDto> list = memberMapper.selectList(parameter);
+        if (!CollectionUtils.isEmpty(list)) {
+            int i = 0;
+            for(MemberDto x : list) {
+                x.setTotalCount(totalCount);
+                x.setSeq(totalCount - parameter.getPageStart() - i);
+                i++;
+            }
+        }
+
+        return list;
+
+        //return memberRepository.findAll();
+    }
+
+    @Override
+    public MemberDto detail(String userId) {
+        Optional<Member> optionalMember = memberRepository.findById(userId);
+        if( !optionalMember.isPresent() ){
+            return null;
+        }
+        Member member = optionalMember.get();
+
+        return MemberDto.of(member);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Member> optionalMember = memberRepository.findById(username);
