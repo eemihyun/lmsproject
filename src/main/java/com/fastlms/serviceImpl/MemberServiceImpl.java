@@ -9,6 +9,7 @@ import com.fastlms.dto.MemberInput;
 import com.fastlms.dto.ResetPasswordInput;
 import com.fastlms.entity.Member;
 import com.fastlms.exception.MemberNotEmailAuthException;
+import com.fastlms.exception.MemberStopUserException;
 import com.fastlms.repository.MemberRepository;
 import com.fastlms.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +59,7 @@ public class MemberServiceImpl implements MemberService {
                 .regDt(LocalDateTime.now())
                 .emailAuthYn(false)
                 .emailAuthKey(uuid)
+                .userStatus(Member.MEMBER_STATUS_REQ)
                 .build();
 
         /*
@@ -97,6 +99,7 @@ public class MemberServiceImpl implements MemberService {
             return false;
         }
 
+        member.setUserStatus(Member.MEMBER_STATUS_ING);
         member.setEmailAuthYn(true);
         member.setEmailAuthDt(LocalDateTime.now());
         memberRepository.save(member);
@@ -227,9 +230,14 @@ public class MemberServiceImpl implements MemberService {
 
         Member member = optionalMember.get();
 
-        if(!member.isEmailAuthYn()) { // true가 아니면
+        if(Member.MEMBER_STATUS_REQ.equals(member.getUserStatus())){
             throw new MemberNotEmailAuthException("이메일 활성화 이후에 로그인을 해주세요.");
         }
+
+        if (Member.MEMBER_STATUS_STOP.equals(member.getUserStatus())) {
+            throw new MemberStopUserException("정지된 회원 입니다.");
+        }
+
 
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
