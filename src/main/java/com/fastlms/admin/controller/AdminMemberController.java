@@ -2,14 +2,14 @@ package com.fastlms.admin.controller;
 
 import com.fastlms.admin.dto.MemberDto;
 import com.fastlms.admin.model.MemberParam;
+import com.fastlms.admin.model.MemberInput;
 import com.fastlms.admin.util.PageUtil;
-import com.fastlms.entity.Member;
 import com.fastlms.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -50,5 +50,18 @@ public class AdminMemberController {
         return "admin/member/detail";
     }
 
+    @PostMapping("/admin/member/status.do")
+    public String status(Model model, MemberInput parameter) {
+        boolean result = memberService.updateStatus(parameter.getUserId(), parameter.getUserStatus());
+
+        return "redirect:/admin/member/detail.do?userId="+parameter.getUserId();
+    }
+
+    @PostMapping("/admin/member/password.do")
+    public String password(Model model, MemberInput parameter) {
+        boolean result = memberService.updatePassword(parameter.getUserId(), parameter.getPassword());
+
+        return "redirect:/admin/member/detail.do?userId="+parameter.getUserId();
+    }
 
 }
