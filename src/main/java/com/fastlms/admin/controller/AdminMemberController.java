@@ -4,6 +4,7 @@ import com.fastlms.admin.dto.MemberDto;
 import com.fastlms.admin.model.MemberParam;
 import com.fastlms.admin.model.MemberInput;
 import com.fastlms.admin.util.PageUtil;
+import com.fastlms.course.controller.BaseController;
 import com.fastlms.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class AdminMemberController {
+public class AdminMemberController extends BaseController {
     private final MemberService memberService;
     @GetMapping("/admin/member/list.do")
     public String list(Model model, MemberParam parameter) {
@@ -29,11 +30,11 @@ public class AdminMemberController {
             totalCount = members.get(0).getTotalCount();
         }
         String queryString = parameter.getQueryString();
+        String pagerHtml = getParamHtml(totalCount, parameter.getPageSize(), parameter.getPageIndex(), queryString);
 
-        PageUtil pageUtil = new PageUtil(totalCount, parameter.getPageSize(), parameter.getPageIndex(), queryString);
         model.addAttribute("members", members);
-        model.addAttribute("pager", pageUtil.pager());
         model.addAttribute("totalCount",totalCount);
+        model.addAttribute("pager", pagerHtml);
 
 
         return "admin/member/list";

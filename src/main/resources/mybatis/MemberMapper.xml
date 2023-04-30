@@ -23,9 +23,9 @@
                 <otherwise>
                     and
                     (
-                    user_id like concat('%', %#{searchValue}%, '%')
-                    or user_name like concat('%', %#{searchValue}%, '%')
-                    or phone like concat('%', %#{searchValue}%, '%')
+                    user_id like concat('%', #{searchValue}%, '%')
+                    or user_name like concat('%', #{searchValue}%, '%')
+                    or phone like concat('%', #{searchValue}%, '%')
                     )
                 </otherwise>
             </choose>
@@ -51,9 +51,9 @@
                 <otherwise>
                     and
                     (
-                        user_id like concat('%', %#{searchValue}%, '%')
-                        or user_name like concat('%', %#{searchValue}%, '%')
-                        or phone like concat('%', %#{searchValue}%, '%')
+                        user_id like concat('%', #{searchValue}%, '%')
+                        or user_name like concat('%', #{searchValue}%, '%')
+                        or phone like concat('%', #{searchValue}%, '%')
                     )
                 </otherwise>
             </choose>
