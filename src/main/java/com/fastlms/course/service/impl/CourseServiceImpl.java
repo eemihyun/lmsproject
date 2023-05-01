@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +23,38 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public boolean add(CourseInput parameter) {
         Course course = Course.builder()
+                .categoryId(parameter.getCategoryId())
                 .subject(parameter.getSubject())
+                .summary(parameter.getSummary())
+                .contents(parameter.getContents())
+                .price(parameter.getPrice())
+                .salePrice(parameter.getSalePrice())
+                .keyword(parameter.getKeyword())
                 .regDt(LocalDateTime.now())
                 .build();
 
         courseRepository.save(course);
+        return true;
+    }
+
+    @Override
+    public boolean set(CourseInput parameter) {
+        Optional<Course> optionalCourse = courseRepository.findById(parameter.getId());
+        
+        if( !optionalCourse.isPresent() ){
+            return false; // 수정사항 없음
+        }
+        Course course = optionalCourse.get();
+        course.setCategoryId(parameter.getCategoryId());
+        course.setSubject(parameter.getSubject());
+        course.setKeyword(parameter.getKeyword());
+        course.setSummary(parameter.getSummary());
+        course.setContents(parameter.getContents());
+        course.setPrice(parameter.getPrice());
+        course.setSalePrice(parameter.getSalePrice());
+        course.setUdtDt(LocalDateTime.now());
+        courseRepository.save(course);
+
         return true;
     }
 
@@ -47,4 +75,12 @@ public class CourseServiceImpl implements CourseService {
 
         return list;
     }
+
+    @Override
+    public CourseDto getById(long id) {
+
+        return courseRepository.findById(id).map(CourseDto::of).orElse(null);
+    }
+
+
 }
