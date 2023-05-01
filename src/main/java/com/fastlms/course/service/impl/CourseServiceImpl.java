@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +22,22 @@ import java.util.Optional;
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
+    private LocalDate getLocalDate(String value) {
+        DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
+        try {
+            return LocalDate.parse(value, formatter);
+        } catch (Exception e){
+
+        }
+        return null;
+    }
+
+
     @Override
     public boolean add(CourseInput parameter) {
+
+        LocalDate saleEndDt = getLocalDate(parameter.getSaleEndDtText());
+
         Course course = Course.builder()
                 .categoryId(parameter.getCategoryId())
                 .subject(parameter.getSubject())
@@ -30,6 +46,7 @@ public class CourseServiceImpl implements CourseService {
                 .price(parameter.getPrice())
                 .salePrice(parameter.getSalePrice())
                 .keyword(parameter.getKeyword())
+                .saleEndDt(saleEndDt)
                 .regDt(LocalDateTime.now())
                 .build();
 
@@ -40,6 +57,8 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public boolean set(CourseInput parameter) {
         Optional<Course> optionalCourse = courseRepository.findById(parameter.getId());
+
+        LocalDate saleEndDt = getLocalDate(parameter.getSaleEndDtText());
         
         if( !optionalCourse.isPresent() ){
             return false; // 수정사항 없음
@@ -52,6 +71,7 @@ public class CourseServiceImpl implements CourseService {
         course.setContents(parameter.getContents());
         course.setPrice(parameter.getPrice());
         course.setSalePrice(parameter.getSalePrice());
+        course.setSaleEndDt(saleEndDt);
         course.setUdtDt(LocalDateTime.now());
         courseRepository.save(course);
 
